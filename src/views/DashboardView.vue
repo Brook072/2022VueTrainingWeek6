@@ -8,17 +8,6 @@ const router = useRouter();
 const { logout } = useDashboardStore();
 const { token, isLogined } = storeToRefs(useDashboardStore());
 
-function getToken() {
-  let cookieAry = document.cookie.split("; ");
-  let cookieObj = {};
-  cookieAry.forEach((item) => {
-    let key = item.split("=")[0];
-    let value = item.split("=")[1];
-    cookieObj[key] = value;
-  });
-  token.value = cookieObj["token"];
-}
-
 function loginConfirmation() {
   if (token.value === null) {
     alert("請重新登入");
@@ -59,6 +48,7 @@ function useLogout() {
         document.cookie = "max-age=0";
         document.cookie = "Expires=Thu, 01 Jan 1970 00:00:00 GMT";
         token.value = "";
+        isLogined.value = false;
         router.push("/");
       } else {
         alert(res.data.message);
@@ -70,7 +60,6 @@ function useLogout() {
     });
 }
 
-getToken();
 loginConfirmation();
 </script>
 
