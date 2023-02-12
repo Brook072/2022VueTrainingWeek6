@@ -36,7 +36,7 @@ function getGoodsData() {
     .then((res) => {
       if (res.data.success === false) {
         alert(res.data.message);
-        router.push("/dashboard/adminLogin");
+        router.push("/adminLogin");
       } else {
         goodsData.value = [];
         let originData = Object.entries(res.data.products);

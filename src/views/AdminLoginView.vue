@@ -8,7 +8,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const router = useRouter();
 const username = ref("");
 const password = ref("");
-const { token, isLogined } = storeToRefs(useDashboardStore());
+const { token } = storeToRefs(useDashboardStore());
 
 function loginPost() {
   axios
@@ -20,9 +20,8 @@ function loginPost() {
       document.cookie = "max-age = 86400";
       document.cookie = `token = ${res.data.token}`;
       document.cookie = "Path = /";
-      getToken()
+      getToken();
       alert(res.data.message);
-      isLogined.value = true;
       router.push("/dashboard/inventories");
     })
     .catch((err) => {
