@@ -58,7 +58,6 @@ const router = createRouter({
       component: DashboardView,
       beforeEnter: async () => {
         let isAuthorized;
-        await loginConfirmation().then((data) => (isAuthorized = data));
         let cookieAry = document.cookie.split("; ");
         let cookieObj = {};
         cookieAry.forEach((item) => {
@@ -67,10 +66,11 @@ const router = createRouter({
           cookieObj[key] = value;
         });
         token = cookieObj["token"];
-        if (token === null) {
+        if (!token) {
           alert("請重新登入");
-          isAuthorized = false;
+          return { path: "/adminLogin" };
         }
+        await loginConfirmation().then((data) => (isAuthorized = data));
         if (isAuthorized === false) {
           return { path: "/adminLogin" };
         }
