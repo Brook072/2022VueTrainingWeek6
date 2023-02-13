@@ -8,6 +8,31 @@ import InventoriesView from "../views/InventoriesView.vue";
 import AdminLoginView from "../views/AdminLoginView.vue";
 
 const apiUrl = import.meta.env.VITE_API_URL;
+let token;
+
+async function loginConfirmation() {
+  return axios
+    .post(
+      `${apiUrl}/v2/api/user/check`,
+      {},
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    )
+    .then((res) => {
+      if (res.data.success === false) {
+        return false;
+      } else {
+        return true;
+      }
+    })
+    .catch((err) => {
+      alert(err.response.data.message);
+      return false;
+    });
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,7 +56,9 @@ const router = createRouter({
       path: "/dashboard",
       name: "後台",
       component: DashboardView,
-      beforeEnter: (to, from, next) => {
+      beforeEnter: async () => {
+        let isAuthorized;
+        await loginConfirmation().then((data) => (isAuthorized = data));
         let cookieAry = document.cookie.split("; ");
         let cookieObj = {};
         cookieAry.forEach((item) => {
@@ -39,32 +66,13 @@ const router = createRouter({
           let value = item.split("=")[1];
           cookieObj[key] = value;
         });
-        let token = cookieObj["token"];
+        token = cookieObj["token"];
         if (token === null) {
           alert("請重新登入");
-          next("/adminLogin");
-        } else {
-          axios
-            .post(
-              `${apiUrl}/v2/api/user/check`,
-              {},
-              {
-                headers: {
-                  Authorization: token,
-                },
-              }
-            )
-            .then((res) => {
-              if (res.data.success === false) {
-                next("/adminLogin");
-              } else {
-                next();
-              }
-            })
-            .catch((err) => {
-              alert(err.response.data.message);
-              next("/adminLogin");
-            });
+          isAuthorized = false;
+        }
+        if (isAuthorized === false) {
+          return { path: "/adminLogin" };
         }
       },
       children: [
